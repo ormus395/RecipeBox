@@ -3,61 +3,90 @@ import "./form.css";
 class Form extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      title: "",
+      ingredients: [""]
+    };
   }
 
-  componentWillMount() {
-    let formObj = {};
-    let { recipe } = this.props;
-    for (let prop in recipe) {
-      if (typeof recipe[prop] == "object") {
-        for (let value of recipe[prop]) {
-          formObj[value] = value;
-        }
-      } else {
-        formObj[prop] = recipe[prop];
-      }
+  componentDidMount() {
+    this.setState({ ...this.props.recipe });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.recipe === prevProps.recipe) {
+      return;
+    } else {
+      this.setState({ ...this.props.recipe });
     }
-    this.setState({ ...formObj });
   }
 
-  // componentDidUpdate()
+  componentWillUnmount() {
+    this.setState({ title: "", ingredients: [""] });
+  }
 
   handleChange = e => {
-    console.log(e.target.name);
     this.setState({ [e.target.name]: e.target.value });
   };
 
   handleSubmit = e => {
     e.preventDefault();
-    return this.props.handleSave(this.state);
+    this.props.handleSave({ ...this.state });
+    this.setState({ title: "", ingredients: [""] });
+  };
+
+  handleNewIngredient = e => {
+    const { ingredients } = this.state;
+    this.setState({ ingredients: [...ingredients, ""] });
+  };
+
+  handleChangeIng = e => {
+    const index = Number(e.target.name.split("-")[1]);
+    const ingredients = this.state.ingredients.map(
+      (ing, i) => (i === index ? e.target.value : ing)
+    );
+    this.setState({ ingredients });
   };
 
   render() {
-    let { recipe } = this.props;
-    let inputs = [];
-    let i = 0;
-    for (let field in this.state) {
-      i++;
-      console.log(field);
-      inputs.push(
-        <label key={field + i} htmlFor={field}>
-          {field === "title" || field === "id" ? field : "Ingredient"}
+    const { title, ingredients } = this.state;
+    let inputs = ingredients.map((ing, i) => (
+      <div key={`ingredients-${i}`}>
+        <label htmlFor="">
+          {i + 1}.
           <input
-            key={field}
             type="text"
-            onChange={this.handleChange}
-            name={field}
-            value={this.state[field]}
+            name={`ingredients-${i}`}
+            value={ing}
+            size={45}
+            autoComplete="off"
+            placeholder={"Ingredient"}
+            onChange={this.handleChangeIng}
           />
         </label>
-      );
-    }
+      </div>
+    ));
+    console.log("updating");
     return (
-      <form className="form" onSubmit={this.handleSubmit}>
+      <div>
+        <label htmlFor="">
+          Tittle
+          <input
+            type="text"
+            key="title"
+            name="title"
+            value={title}
+            size={42}
+            autoComplete="off"
+            onChange={this.handleChange}
+          />
+        </label>
         {inputs}
-        <button>Save</button>
-      </form>
+        <button onClick={this.handleNewIngredient}>+</button>
+        <button onClick={this.handleSubmit} type="submit">
+          Save
+        </button>
+      </div>
     );
   }
 }

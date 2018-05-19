@@ -11,6 +11,11 @@ body {
   cursor: pointer;
 }
 
+.container {
+  max-width: 1200px;
+  margin: 10px auto;
+}
+
 .btn:hover {
   box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
 }
@@ -18,4 +23,12 @@ body {
 .danger {
   background-color: maroon;
   color: white;
+}
+
+.warning {
+  background-color: orange;
+}
+
+.success {
+  background-color: green;
 }
